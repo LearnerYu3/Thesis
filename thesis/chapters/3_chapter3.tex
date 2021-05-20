@@ -1,0 +1,265 @@
+\chapter{单站跟踪定位模型的求解算法}
+
+\section{OLS求解算法}
+普通最小二乘算法（Ordinary Least Squares，OLS）是最常用的求解估计算法，通过最小化误差的平方和求出超定线性方程组的最优解，具体求解过程如下：
+\begin{equation}
+	b = AX + e
+\end{equation}
+其中 $e$ 为误差项，定义损失函数为
+\begin{equation}
+	J(X) = (b-AX)^T (b_AX)
+\end{equation}
+为了使得误差得平方和最小，即求解如下问题
+\begin{equation}
+	\min_{X} J(X)
+\end{equation}
+令 $J(X)$ 对 $X$ 求导，令导函数为零，求出极值点满足：
+\begin{equation}
+	A^T AX = A^T b
+\end{equation}
+若矩阵 $A^TA$ 可逆，即 $A$ 列满秩，便可得：
+\begin{equation}
+	X = (A^TA)^{-1}(A^Tb)
+\end{equation}
+利用OLS对定位跟踪问题式(2-19)进行求解，可以得到目标在时刻 $jT$ 的状态矢量为
+\begin{equation}
+	\bm{X}_j = (A^TA)^{-1}(A^Tb)
+\end{equation}
+由于在实际情况中仅能得到目标角度信息的测量值，不能得到真实值，所以目标的状态矢量估计值表示为
+\begin{equation}
+	\hat{\bm{X}}_j = ({A^*}^TA^*)^{-1}({A^*}^Tb^*)	
+\end{equation}
+\section{TLS求解算法}
+通过最小二乘法的求解过程可知，OLS仅考虑了观测矩阵存在误差，没有考虑系数矩阵存在误差。总体最小二乘法（Total Least Squares，TLS）同时考虑了系数矩阵和观测矩阵存在误差的情况，即考虑矩阵方程为：
+\begin{equation}
+	(A+E)X = b + e
+\end{equation}
+其中 $E,e$ 分别表示系数矩阵和观测矩阵的误差项，记 $B = [-b \quad A],D = [-e \quad E]$，可得
+\begin{equation}
+	(B+D) \left[\begin{array}{c}
+		1 \\ \bm{X}
+	\end{array} \right]_{1\times (n+1)}= \bm{0}
+\end{equation}
+求解式(3-9)的总体最小二乘法可以表示为求解如下问题 
+\begin{equation}
+	\min_{X} \left\|D\right\|_F^2 
+\end{equation}
+若矩阵 $B$ 为满秩矩阵（在可观测的条件下得到的矩阵为满秩矩阵），对矩阵进行奇异值分解，并使对角矩阵的对角元素满足 $\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_{n+1}$，即
+\begin{equation}
+	B = U \left[\begin{array}{ccc}
+		\lambda_1 & \cdots & 0 \\
+		0& \ddots & 0 \\
+		0 & \cdots & \lambda_{n+1} \\
+		\vdots & \vdots & \vdots \\
+		0 & \cdots & 0
+	\end{array}\right] V^H
+\end{equation}
+为保证式(3-9)有非零根，矩阵 $B+D$ 必须为降秩矩阵，又有
+\begin{equation}
+	B = \sum_{i=1}^{n+1}\lambda_i u_i v_i^T
+\end{equation}
+其中，$u_i,v_i$ 分别对应 $U,V$ 的第 $i$ 个列向量，为了满足式(3-10)，应有
+\begin{equation}
+	D = -\lambda_{n+1} u_{n+1} v_{n+1}^T
+\end{equation}
+此时可以求得
+\begin{equation}
+	\left\| D \right\|_F^2 = tr(D^TD) = \lambda_{n+1}^2
+\end{equation}
+根据式(3-13)便可得到
+\begin{equation}
+	(B+D)V = U\left[\begin{array}{ccc}
+		\lambda_1 & \cdots & 0 \\
+		0& \ddots & 0 \\
+		0 & \cdots & 0 \\
+		\vdots & \vdots & \vdots \\
+		0 & \cdots & 0
+	\end{array}\right]
+\end{equation}
+根据矩阵相乘可以得到
+\begin{equation}
+	(B+D)v_{n+1} = \bm{0} 
+\end{equation}
+由此可以得到
+\begin{equation}
+	\bm{X} = \frac{1}{v_{1,n+1}}\left[\begin{array}{c}
+		v_{2,n+1} \\ v_{3,n+1} \\ \vdots \\ v_{n+1,n+1}
+	\end{array}\right]
+\end{equation}
+利用TLS算法求解式(2-29)可以得到目标的状态矢量的估计值为
+\begin{equation}
+	\hat{\bm{X}}_j = \frac{1}{v_{1,7}}\left[\begin{array}{c}
+		v_{2,7} \\ v_{3,7} \\ \vdots \\ v_{7,7}
+	\end{array}\right]
+\end{equation}
+式(3-11)相应变为如下表达式
+\begin{equation}
+	[-b^* \quad A^*] =  U \left[\begin{array}{ccc}
+		\lambda_1 & \cdots & 0 \\
+		0& \ddots & 0 \\
+		0 & \cdots & \lambda_{n+1} \\
+		\vdots & \vdots & \vdots \\
+		0 & \cdots & 0
+	\end{array}\right] V^H
+\end{equation}
+\section{MLE求解算法}
+OLS和TLS算法是对式(2-19)和式(2-29)中的线性方程组进行求解估计，极大似然估计（Maximum Likelihood Estimation，MLE）则是通过对式(2-16)的处理进行求解估计。令$\bm{\beta}_m=[\beta_{m0},\beta_{m1},\cdots,\beta_{mk}]^T,\bm{\varepsilon}_m = [\varepsilon_{m0},\varepsilon_{m1},\cdots,\varepsilon_{mk}]^T,\bm{\theta}_m = [\bm{\beta}^T,\bm{\varepsilon}^T]^T$，在测量噪声服从正态分布的情况下，$\bm{X}$ 的似然函数为
+\begin{equation}
+	p(\bm{\theta}_m|\bm{X}) = [(2\pi)^{(k+1)}\det W]^{-1/2}\exp[-\frac{1}{2}(\bm{\theta}_m-\bm{\theta}(\bm{X}))^T W^{-1}(\bm{\theta}_m-\bm{\theta}(\bm{X}))]
+\end{equation}
+其中，$W=\sigma^2 I_{2(k+1)\times 1}$，$\bm{\theta}(\bm{X})$ 表示真实的角度矢量。对上式对 $\bm{X}$ 求导，并令导函数为零，可得
+\begin{equation}
+	\left[\frac{\partial \bm{\theta}(\bm{X})}{\bm{X}}\right]^T W^{-1}[\bm{\theta}_m - \bm{\theta}(\bm{X})] = 0
+\end{equation}
+根据式(2-13)可得
+\begin{equation}
+	\begin{split}
+		\frac{\partial \beta_i}{\partial \bm{X}_j} =& \frac{1}{r_i}\left[\begin{array}{cccccc}
+			-\sin\beta_i & \cos\beta_i & 0 & -\sin\beta_i(i-j)T & \cos\beta_i(i-j)T & 0
+		\end{array}\right] \\
+	\frac{\partial \varepsilon_i}{\partial \bm{X}_j} =& \frac{1}{r_i}\left[\begin{array}{c}
+		-\sin\varepsilon_i \cos\beta_i \\ -\sin\varepsilon_i \sin\beta_i \\ \cos\varepsilon_i \\ -\sin\varepsilon_i\cos\beta_i(i-j)T \\ -\sin\varepsilon_i\sin\beta_i (i-j)T \\ \cos\varepsilon_i(i-j)T
+	\end{array}\right]^T
+	\end{split}
+\end{equation}
+其中，$r_i=\sqrt{(x_i-B_{ix})^2 + (y_i - B_{iy})^2 + (z_i - B_{iz})^2}$，由上式可以得到
+\begin{equation}
+	\frac{\partial \bm{\theta}(\bm{X}_j)}{\partial \bm{X}_j} \left|_{\bm{X}_j = \hat{\bm{X}}_j} \right.= \hat{R}^{-1} A^*(\hat{\bm{\theta}})
+\end{equation} 
+其中，$A^*(\hat{\bm{\theta}})$ 即为式(2-29)中的 $A^*$，并将$\beta_{mi},\varepsilon_{mi}$ 换成相应的 $\hat{\beta_i},\hat{\varepsilon_i}$
+\begin{equation}
+	\hat{R} = \left[\begin{array}{ccc|ccc}
+		\hat{r}_0 & \cdots & 0 & 0 & \cdots & 0\\
+		\vdots & \ddots & \vdots & \vdots & \ddots & \vdots \\
+		0 & \cdots & \hat{r}_k & 0 & \cdots & 0 \\ \hline
+		0 & \cdots & 0 & \hat{r}_0 & \cdots & 0 \\
+		\vdots & \ddots & \vdots & \vdots & \ddots & \vdots \\
+		0 & \cdots & 0 & 0 & \cdots  & \hat{r}_k
+	\end{array}\right]
+\end{equation}
+代入式(3-21)可得
+\begin{equation}
+	{A^*}^T(\hat{\bm{\theta}})\hat{R}^{-1}W^{-1}[\bm{\theta}_m - \hat{\bm{\theta}}] = 0
+\end{equation}
+极大似然估计即为非线性方程组式(3-25)的解 $\hat{\bm{X}}_j$，采用高斯-牛顿迭代法求解该非线性方程组，迭代公式为
+\begin{equation}
+	\bm{X}_j^{l+1} = \bm{X}_j^{l} + \mu_l[{A^*}^T(\hat{\bm{\theta}}) \hat{R}^{-1} W^{-1} \hat{R}^{-1} {A^*}(\hat{\bm{\theta}})]^{-1} {A^*}^T(\hat{\bm{\theta}}) \hat{R}^{-1} W^{-1} [\bm{\theta}_m - \hat{\bm{\theta}}]
+\end{equation}
+其中，$\mu_l$是迭代收敛步长，$\hat{R},\hat{\bm{\theta}}$ 是估计值为 $\bm{X}_j^{l}$ 时的计算值。为了保证收敛并提高计算速度，通常取OLS或TLS算法得到的估计值作为初值代入上述迭代公式。
+\section{AUE求解算法}
+近似无偏估计（Approximate Unbiased Estimate，AUE）算法具有更好的估计结果，相比于有偏估计该方法具有更好的定位精度。下面给出该跟踪定位问题的AUE算法，由于测量误差 $n_{\beta i} \approx 0,n_{\varepsilon i} \approx 0$，记
+\begin{equation}
+	\begin{split}
+		e_i =& -(x_i-B_{ix})\sin\beta_{mi} + (y_i -B_{iy})\cos\beta_{mi} \\
+		=&-(x_i -B_{ix})(\sin\beta_i\cos n_{\beta i}+ \cos\beta_i\sin n_{\beta i}) + (y_i -B_{iy})(\cos\beta_i\cos n_{\beta i} - \sin\beta_i \sin n_{\beta i}) \\
+		\approx & [-(x_i-B_{ix})\sin\beta_i + (y_i -B_{iy})\cos\beta_i] + [-(x_i -B_{ix})\cos\beta_i -(y_i - B_{iy})\sin\beta_i]n_{\beta i} 
+	\end{split}
+\end{equation}
+\begin{equation}
+	\begin{split}
+		f_i =& -\sin\varepsilon_{mi}\cos\beta_{mi}(x_i-B_{ix})-\sin\varepsilon_{mi}\sin\beta_{mi}(y_i -B_{iy}) + \cos\varepsilon_{mi}(z_i - B_{iz}) \\
+		=&-[(x_i - B_{ix})(\cos\beta_i\cos n_{\beta i} -\sin\beta_i \sin n_{\beta i}) + (y_i -B_{iy})(\sin\beta_i\cos n_{\beta i} + \cos\beta_i \sin n_{\beta i})]\sin \varepsilon_{mi} \\
+		&+ \cos\varepsilon_{mi}(z_i -B_{iz}) \\
+		=&-[(x_i -B_{ix})\cos\beta_i + (y_i - B_{iy})\sin\beta_i]\cos n_{\beta i}(\sin\varepsilon_i \cos n_{\varepsilon i} + \cos\varepsilon_i \sin n_{\varepsilon i}) \\
+		& - [-(x_i -B_{ix})\sin\beta_i + (y_i -B_{iy})\cos\beta_i]\sin n_{\beta i} (\sin\varepsilon_i \cos n_{\varepsilon i} + \cos \varepsilon_i \sin n_{\varepsilon i}) \\
+		& + (z_i - B_{iz})(\cos\varepsilon_i \cos n_{\varepsilon i} - \sin\varepsilon_i \sin n_{\varepsilon i}) \\
+		\approx & \lbrace -[(x_i -B_{ix})\cos\beta_i + (y_i -B_{iy})\sin\beta_i]\sin\varepsilon_i + (z_i -B_{iz})\cos\varepsilon_i \rbrace \\
+		&+[(x_i -B_{ix})\sin\beta_i - (y_i -B_{iy})\cos\beta_i]\sin\varepsilon_i n_{\beta i} \\
+		&+\lbrace -[(x_i -B_{ix})\cos\beta_i + (y_i -B_{iy})\sin\beta_i]\cos\varepsilon_i - (z_i -B_{iz})\sin\varepsilon_i \rbrace n_{\varepsilon i} 
+	\end{split}
+\end{equation}
+构造代价函数如下
+\begin{equation}
+	\begin{split}
+		J_1^* = \sum_{i=0}^{k}E[e_i^2] =& \sum_{i=0}^{k}[-(x_i -B_{ix})\sin\beta_i + (y_i -B_{iy})\cos\beta_i]^2 \\
+		&+ \sum_{i=0}^{k}\sigma^2[(x_i -B_{ix})\cos\beta_i + (y_i -B_{iy})\sin\beta_i]^2 \\
+		J_2^* = \sum_{i=0}^{k}E[f_i^2] = &\sum_{i=0}^{k}\lbrace-[(x_i -B_{ix})\cos\beta_i + (y_i -B_{iy})\sin\beta_i]\sin\varepsilon_i + (z_i-B_{iz})\cos\varepsilon_i \rbrace ^2 \\
+		& + \sum_{i=0}^{k}\sigma^2 [(x_i -B_{ix})\sin\beta_i - (y_i -B_{iy})\cos\beta_i]^2 \sin^2 \varepsilon_i \\
+		&+ \sum_{i=0}^{k}\lbrace [(x_i -B_{ix})\cos\beta_i + (y_i -B_{iy})\sin\beta_i]\cos\varepsilon_i + (z_i -B_{iz})\sin\varepsilon_i \rbrace ^2 
+	\end{split}
+\end{equation}
+不妨记 $J_1^*$ 中含有 $\sigma^2$ 的项的和为 $\hat{J}_1^*$，其它项的和为 $J_1$，同样的记 $J_2^*$ 中含有 $\sigma^2$ 的项的和为 $\hat{J}_2^*$，其它项的和为 $J_2$，并记
+\begin{equation}
+	J^* = J_1^* + J_2^* = J_1 + J_2 + \hat{J}_1^* + \hat{J}_2^*
+\end{equation}
+为了得到无偏估计，即为求解 $J_1 +J_2$ 的最小值，并保持 $\hat{J}_1^* + \hat{J}_2^*$ 保持为一个定值。
+记 $\bm{q} = c[\bm{X}^T \quad 1]^T$，式中 $c$ 为标量。在忽略 $c$ 时，可以得到
+\begin{equation}
+	\begin{split}
+		J_1 + J_2 =& q^T B_0^T B_0 q \\
+		J_1^* =& \sigma^2 q^T B_1^T B_1 q\\
+		J_2^* =& \sigma^2 q^T B_2^T B_2 q
+	\end{split}	
+\end{equation}
+其中 $B_0 = [A^* \quad -b]$，将矩阵角度测量量相应的换为真实值即可，且有
+\begin{equation}
+	\vspace{-10pt}
+	B_1 = \left[\begin{array}{ccccccc}
+		\cos\beta_0 & \sin\beta_0 & 0 & \cos\beta_0(0-j)T & \sin\beta_0 (0-j)T & 0 & -(B_{0x}\cos\beta_0+B_{0y}\sin\beta_0) \\
+		\cos\beta_1 & \sin\beta_1 & 0 & \cos\beta_1(1-j)T & \sin\beta_1 (1-j)T & 0 & -(B_{1x}\cos\beta_1+B_{1y}\sin\beta_1) \\
+		\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+		\cos\beta_k & \sin\beta_k & 0 & \cos\beta_k(k-j)T & \sin\beta_k (k-j)T & 0 & -(B_{kx}\cos\beta_k+B_{ky}\sin\beta_k)
+	\end{array}\right] 
+\end{equation}
+\begin{equation}
+	\begin{array}{c}
+		B_{21} = \left[\begin{array}{ccc}
+			\sin\varepsilon_0\sin\beta_0 & -\sin\varepsilon_0\cos\beta_0 & 0 \\
+			\sin\varepsilon_1\sin\beta_1 & -\sin\varepsilon_1\cos\beta_1 & 0 \\
+			\vdots & \vdots & \vdots \\
+			\sin\varepsilon_k\sin\beta_k & -\sin\varepsilon_k\cos\beta_k & 0 \\ \hline
+			\cos\varepsilon_0\cos\beta_0 & \cos\varepsilon_0\sin\beta_0 & \sin\varepsilon_0 \\ 
+			\cos\varepsilon_1\cos\beta_1 & \cos\varepsilon_1\sin\beta_1 & \sin\varepsilon_1 \\ 
+			\vdots & \vdots & \vdots \\
+			\cos\varepsilon_k\cos\beta_k & \cos\varepsilon_k\sin\beta_k & \sin\varepsilon_k 
+		\end{array}\right] \\
+		B_{22} = \left[\begin{array}{ccc}
+			\sin\varepsilon_0\sin\beta_0(0-j)T & -\sin\varepsilon_0\cos\beta_0(0-j)T & 0 \\
+			\sin\varepsilon_1\sin\beta_1(1-j)T & -\sin\varepsilon_1\cos\beta_1(1-j)T & 0 \\
+			\vdots & \vdots & \vdots \\
+			\sin\varepsilon_k\sin\beta_k(k-j)T & -\sin\varepsilon_k\cos\beta_k(k-j)T & 0 \\ \hline
+			\cos\varepsilon_0\cos\beta_0(0-j)T & \cos\varepsilon_0\sin\beta_0(0-j)T & \sin\varepsilon_0(0-j)T \\ 
+			\cos\varepsilon_1\cos\beta_1(1-j)T & \cos\varepsilon_1\sin\beta_1(1-j)T & \sin\varepsilon_1(1-j)T \\ 
+			\vdots & \vdots & \vdots \\
+			\cos\varepsilon_k\cos\beta_k(k-j)T & \cos\varepsilon_k\sin\beta_k(k-j)T & \sin\varepsilon_k(k-j)T 
+		\end{array}\right]
+	\end{array}
+\end{equation}
+\begin{equation}
+	b_2 = \left[\begin{array}{c}
+		-B_{0x}\sin\varepsilon_0\sin\beta_0 + B_{0y}\sin\varepsilon_0\cos\beta_0 \\
+		-B_{1x}\sin\varepsilon_1\sin\beta_1 + B_{1y}\sin\varepsilon_1\cos\beta_1 \\
+		\vdots \\
+		-B_{kx}\sin\varepsilon_k\sin\beta_k + B_{ky}\sin\varepsilon_k\cos\beta_k \\ \hline
+		-B_{0x}\cos\varepsilon_0\cos\beta_0 -B_{0y}\cos\varepsilon_0\sin\beta_0 -B_{0z}\sin\varepsilon_0 \\
+		-B_{1x}\cos\varepsilon_1\cos\beta_1 -B_{1y}\cos\varepsilon_1\sin\beta_1 -B_{1z}\sin\varepsilon_1 \\
+		\vdots \\
+		-B_{kx}\cos\varepsilon_k\cos\beta_k -B_{ky}\cos\varepsilon_k\sin\beta_k -B_{kz}\sin\varepsilon_k
+	\end{array}\right]
+\end{equation}
+则 $B_2 = [B_{21} \quad B_{22} \quad b_2]$，从而可求解如下等式约束优化问题求得近似无偏估计值 $\hat{\bm{X}}_j$ \vspace{-12pt}
+\begin{equation}
+	\begin{split}
+		\min_{\bm{X}_j} J_1 &+ J_2 \\
+		s.t. \quad J_1^* + j_2^* &= q^T W q =1
+	\end{split}
+\end{equation}
+其中，$W = \sigma^2 (B_1^T B_1 + B_2^T B_2)$，常数1的约束条件是任意给定的，可以通过通过修改标量 $c$ 得到其它常数。对式(3-35)利用Lagrange乘子法求解，构造辅助函数为
+\begin{equation}
+	L(\bm{q},\lambda) = \bm{q}^T B_0^T B_0 \bm{q} + \lambda(1-\bm{q}^T W \bm{q})
+\end{equation}
+对 $L(\bm{q},\lambda)$ 关于 $\bm{q}$ 求导，并令导函数为0得
+\begin{equation}
+	B_0^T B_0 \bm{q} = \lambda W \bm{q}
+\end{equation}
+从上式可以看出 $\bm{q}$ 为矩阵 $[B_0^TB_0 \quad W]$ 的广义特征向量，式(3-37)两边同时左乘 $\bm{q}^T$ 可得
+\begin{equation}
+	\lambda = \bm{q}^T B_0^T B_0 \bm{q}
+\end{equation}
+矩阵 $[B_0^T B_0 \quad W]$ 最小广义特征值对应的特征向量 $\bm{q}$ 即为所求，目标在 $jT$ 时刻的状态矢量即为
+\begin{equation}
+	\bm{X}_j = \frac{1}{q_7}\left[\begin{array}{cccc}
+		q_1 & q_2 & \cdots & q_6
+	\end{array}\right] ^T
+\end{equation}
+由于在计算时角度信息真实值是未知的，一般使用测量值代入计算。

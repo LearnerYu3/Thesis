@@ -1,0 +1,380 @@
+%%
+% The BIThesis Template for Bachelor Graduation Thesis
+%
+% 北京理工大学毕业设计（论文）第一章节 —— 使用 XeLaTeX 编译
+%
+% Copyright 2020 Spencer Woo
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is Spencer Woo.
+%
+% 第一章节
+
+\chapter{基于纯角度信息的单站跟踪定位模型}
+本文主要讨论三维空间中基于纯角度信息的单站无源跟踪定位问题，关于该问题的模型如下图所示：
+
+\begin{figure}[h]
+  \vspace{13pt}
+  \centering
+  \begin{tikzpicture}[scale=0.66]
+      \draw[->] (0,0) -- (13,0) node[below] {$X$};
+      \draw[->] (0,0) -- (5,6.67) node[left] {$Y$};
+      \draw[->] (0,0) -- (0,10) node[left] {$Z$};
+      \draw (0,0) node[below] {$O$};
+      \draw[->] (3,1) node[below] {$B$} -- (4,0.8) node[below] {$\bm{v_B}$};
+      \draw[->] (9,6) node[left] {$G$} -- (10,6.3) node[above] {$\bm{v_G}$};
+      \draw[dashed] (9,6) -- (9,3);
+      \coordinate (a) at (7.5,1);
+      \coordinate (b) at (3,1);
+      \coordinate (c) at (9,3);
+      \coordinate (d) at (9,6);
+      \draw[dashed] (a) -- (b) -- (c)
+        pic [draw, ->, "$\scriptstyle\beta$", angle radius=7mm, angle eccentricity=1.5] {angle = a--b--c};
+      \draw[dashed] (c) -- (b) -- (d) 
+        pic [draw, ->, "$\varepsilon$", angle radius=5mm, angle eccentricity=1.5] {angle = c--b--d};
+     
+      \draw (b) -- (d);
+      \draw[dashed] (9,1) -- (a);
+      \draw[dashed] (1,1) -- (b);
+  \end{tikzpicture}
+  \caption{纯角度单站跟踪定位模型示意图}
+\end{figure}
+
+其中，$G$ 表示运动的目标，$B$ 表示运动的观测站，$\bm{v_G}$ 和 $\bm{v_B}$ 分别表示目标和观测站运动的速度矢量，$\varepsilon$ 表示目标 $G$ 和观测站 $B$ 连线与 $XOY$ 平面形成的夹角，并称之为仰角，$\beta$ 表示目标 $G$ 在 $XOY$ 平面的投影点和观测站 $B$ 连线与 $X$ 轴正向形成的夹角，并称之为方位角。
+
+在纯角度信息的单站跟踪定位模型中，观测站的运动信息是已知的，观测站每经过时间 $T$ 对运动的目标进行一次测量，得到目标的仰角和方位角测量值，然后根据这些已知信息对目标进行定位跟踪。然而，在多数情况下，单站无源定位在仅有角度信息时只能描述目标所在的方向，无法确定目标的距离，从而也就无法确定目标的实际位置。因此需要对运动目标的可观测性进行分析。
+\section{可观测性分析}
+假设目标做匀速直线运动，根据文献\cite{4104040}，假设目标 $G$ 的位置坐标为 $(r_{Gx},r_{Gy},r_{Gz})$，以速度 $(v_{Gx},v_{Gy},v_{Gz})$ 匀速运动，故目标在坐标系下的状态矢量可表示为 
+\begin{equation*}
+	\bm{X}_{G} = [r_{Gx},r_{Gy},r_{Gz},v_{Gx},v_{Gy},v_{Gz}]^T
+\end{equation*} 
+同样的，观测站的状态矢量可表示为 
+\begin{equation*}
+	\bm{X}_B = [r_{Bx},r_{By},r_{Bz},v_{Bx},v_{By},v_{Bz}]^T
+\end{equation*}
+则目标相对于观测站的状态矢量可表示为
+\begin{equation}
+	\bm{X} = \bm{X}_G - \bm{X}_B = [r_x,r_y,r_z,v_x,v_y,v_z]^T
+\end{equation}
+从而得到
+\begin{equation}
+	\dot{\bm{X}} = A\bm{X} - \bm{u} \label{eq:1}
+\end{equation}
+其中
+\begin{equation*}
+		A = \left[ \begin{array}{ccc|ccc}
+			0 & 0 & 0 & 1 & 0 & 0 \\
+			0 & 0 & 0 & 0 & 1 & 0 \\
+			0 & 0 & 0 & 0 & 0 & 1 \\ \hline 
+			0 & 0 & 0 & 0 & 0 & 0 \\
+			0 & 0 & 0 & 0 & 0 & 0 \\
+			0 & 0 & 0 & 0 & 0 & 0 \\
+		\end{array} \right ], \quad
+	\bm{u} = [\bm{0}, \bm{a}^T ]^T = [0, 0, 0, a_x, a_y, a_z]^T 
+\end{equation*}
+$\bm{a} = [a_x,a_y,a_z]^T$ 表示观测站的加速度，对式\ref{eq:1}求积分可得
+\begin{equation}
+	\begin{split}
+		\bm{r}(t) =& \bm{r}(t_0) + (t-t_0)\bm{v}(t_0) - \int_{t_0}^{t}(t-\tau)\bm{a}(\tau)d\tau \\
+		\bm{v}(t) =& \bm{v}(t_0) - \int_{t_0}^{t}\bm{a}(\tau)d\tau
+	\end{split}	
+\end{equation}
+其中 $t_0$ 表示任意确定的初始时刻。
+
+对于方位角和仰角，根据几何知识可以得到
+\begin{equation}
+	\begin{split}
+		\beta =& \arctan \frac{r_y}{r_x} \\
+		\varepsilon =& \arctan \frac{r_z}{\sqrt{r_x^2 + r_y^2}}
+	\end{split}
+\end{equation}
+对上式做等价变形可得到（参见附录中A部分）
+\begin{equation}
+	H\bm{X}=\bm{0} \label{eq:2}
+\end{equation}
+其中
+\begin{equation*}
+	H = \left[\begin{array}{cccccc}
+		1 & 0 & -\cos\beta\cot\varepsilon & 0 & 0 & 0\\
+		0 & 1 & -\sin\beta\cot\varepsilon & 0 & 0 & 0
+	\end{array}\right]
+\end{equation*}
+假定 $\varepsilon \not \equiv 0$，在不考虑噪声的情况下，可以精确确定 $\bm{H}$，根据附录中B部分结论可对式(\ref{eq:1})和式(\ref{eq:2})的线性系统进行处理，从而得到可观测性的充分必要条件，即目标可被唯一确定的充分必要条件。
+\begin{equation}
+	\det[C^TC] \not \equiv 0
+\end{equation}
+其中
+\begin{equation}
+	C = \left[\begin{array}{c}
+		C_0 \\ \hline
+		C_1 \\ \hline
+		C_2 \\ \hline
+		C_3 \\ \hline
+		C_4 \\ \hline
+		C_5 
+	\end{array}\right] 
+	= \left[\begin{array}{c}
+		H \\ \hline
+		\dot{C_0} + C_0 A \\ \hline
+		\dot{C_1} + C_1 A \\ \hline
+		\dot{C_2} + C_2 A \\ \hline
+		\dot{C_3} + C_3 A \\ \hline
+		\dot{C_4} + C_4 A 
+	\end{array}\right]
+\end{equation}
+由于 $A$ 和 $H$ 都是稀疏矩阵，可以得到 $C$ 的形式如下
+\begin{equation}
+	C = \left[\begin{array}{c|c|c|c}
+		I & \bm{h}_0 & O & \bm{0} \\ \hline
+		O & \bm{h}_1 & I & \bm{h}_0 \\ \hline
+		O & \bm{h}_2 & O & 2\bm{h}_1 \\ \hline
+		O & \bm{h}_3 & O & 3\bm{h}_2 \\ \hline
+		O & \bm{h}_4 & O & 4\bm{h}_3 \\ \hline
+		O & \bm{h}_5 & O & 5\bm{h}_4
+	\end{array}\right]
+\end{equation}
+其中，$I$ 是 $2 \times 2$ 的单位矩阵，$O$ 是 $2 \times 2$ 的零矩阵，并且有
+\begin{equation}
+	\bm{h}_i = \left[\begin{array}{c}
+		f_i \\ g_i
+	\end{array}\right] = - \left[\begin{array}{c}
+	\frac{d^i(\cos\beta\cot\varepsilon)}{dt^i} \\
+	\frac{d^i(\sin\beta\cot\varepsilon)}{dt^i}
+\end{array}\right] \quad i=0,1,2,\cdots
+\end{equation}
+将矩阵 $C$ 的第二个和第三个分区列互换，此时 $\det[C^TC]$ 的值并不会改变，在结合行列式简化公式（参见附录中C部分）可得到
+\begin{equation}
+	\det[C^TC] = \det \left[\begin{array}{cc}
+		\sum_{i=1}^{4}\bm{h}'_{i+1}\bm{h}_{i+1} & \sum_{i=1}^{4}(i+1)\bm{h}'_{i+1}\bm{h}_i \\
+		\sum_{i=1}^{4} (i+1)\bm{h}'_{i}\bm{h}_{i+1} & \sum_{i=1}^{4}(i+1)^2\bm{h}'_i\bm{h}_i
+	\end{array}\right]
+\end{equation}
+最终得到
+\begin{equation}
+	\begin{split}
+		\det[C^TC] =& \frac{1}{2}\sum_{i=1}^{4}\sum_{j=1}^{4}\lbrace [(i+1)f_i f_{j+1} - (j+1)f_j f_{i+1}]^2 + 2[(i+1)f_i g_{j+1} - (j+1) g_j f_{i+1}]^2 \\
+		&+ [(i+1)g_i g_{j+1} - (j+1)g_j g_{i+1}]^2 \rbrace
+	\end{split}	\label{eq:3}
+\end{equation}
+由式(\ref{eq:3})可看出，当且仅当两次求和中至少有一项不完全相同时，才满足 $\det[C^TC] \not \equiv 0$，根据附录中C部分可以得到满足该条件的充分必要条件为
+\begin{equation}
+	\int_{t_0}^{t}(t-\tau)\bm{a}(\tau)d\tau \not \equiv \alpha(t)[\bm{r}(t_0)+(t-t_0)\bm{v}(t_0)]
+\end{equation}
+对任意的标量函数 $\alpha$ 成立
+
+通过以上描述，得到了目标做匀速直线运动时的可观测性条件。本文的以下内容是在可观测的条件下对纯角度的单站无源定位模型进行分析求解。
+\section{跟踪定位模型}
+假设目标做匀速直线运动，在 $k$ 个时间周期，每个时间周期时间为 $T$，观测站从初始时刻（记初始时刻 $t_0=0$）开始测量目标的方位信息，之后每经过时间周期 $T$ 对目标的方位信息进行一次测量，得到目标相对于观测站的仰角和方位角分别为 $\varepsilon_i$ 和 $\beta_i$，其中 $k = 0,1,2,\cdots,k$ 
+
+根据图(2-1)及几何关系可得：
+\begin{equation}
+	\begin{cases}
+		\beta_i = \arctan \frac{y_i-B_{iy}}{x_i-B_{ix}} &i=0,1,2,\cdots,k \\
+		\varepsilon_i = \arctan \frac{z_i-B_{iz}}{\sqrt{(x_i-B_{ix})^2 + (y_i - B_{iy})^2}} \quad &i=0,1,2,\cdots,k
+	\end{cases}\label{eq:arctan}
+\end{equation}
+其中，$(B_{ix},B_{iy},B_{iz})$ 表示观测站 $B$ 在时刻 $iT$ 时的坐标，$\bm{X}_i = (x_i,y_i,z_i,v_x,v_y,v_z)^T$ 表示目标在时刻 $iT$ 时的状态矢量，从而可以由目标在 $iT$ 时刻的状态得到目标在 $jT$ 时刻的状态：
+\begin{equation}
+	\begin{cases}
+		x_j = x_i + v_x(j-i)T\\
+		y_j = y_i + v_y (j-i)T\\
+		z_j = z_i + v_z(j-i)T
+	\end{cases}
+\end{equation}
+其中 $i,j \in \lbrace 0,1,2,\cdots,k \rbrace$。根据三角函数公式并结合式(2-14)可以对式(\ref{eq:arctan})进行如下变形：
+\begin{equation}
+	\begin{cases}
+		\cos\beta_i(y_j + v_y(i-j)T-B_{iy}) = \sin\beta_i(x_j+v_x(i-j)T-B_{ix}) \\
+		\sin\varepsilon_i \cos\beta_i(x_j+v_x(i-j)T-B_{ix}) + \sin\varepsilon_i \sin\beta_i(y_j + v_y(i-j)T-B_{iy}) \\
+		 = \cos\varepsilon_i (z_j + v_z(i-j)T - B_{iz})
+	\end{cases}
+\end{equation}
+其中 $i=0,1,2,\cdots,k,j \in \lbrace 0,1,2,\cdots,k \rbrace$。
+由于在实际情况中测量角度得到的观测值可能存在噪声，并不是真实值，即
+\begin{equation}
+	\begin{cases}
+		\beta_{mi} = \beta_i + n_{\beta i} \\
+		\varepsilon_{mi} = \varepsilon_i + n_{\varepsilon i}
+	\end{cases}
+\end{equation}
+其中，$\beta_{mi},\varepsilon_{mi}$ 表示观测值，$\beta_i,\varepsilon_i$ 表示真实值，$n_{\beta i},n_{\varepsilon i}$ 表示误差值，并假设 $n_{\beta i} \sim N(0,\sigma^2),n_{\varepsilon i} \sim N(0,\sigma^2)$，且$n_{\beta i},n_{\varepsilon i}$相互独立。
+由 Taylor 展开，令$n_{\varepsilon i} \rightarrow 0,n_{\beta i} \rightarrow 0$，可以得到
+\begin{equation}
+	\begin{cases}
+		\cos\beta_i = \cos\beta_{mi} + \sin\beta_{mi}n_{\beta i} + o(n_{\beta i}) \\
+		\sin\beta_i = \sin\beta_{mi} - \cos\beta_{mi}n_{\beta i} + o(n_{\beta i}) \\
+		\cos\varepsilon_i = \cos\varepsilon_{mi} + \sin\varepsilon_{mi}n_{\varepsilon i} + o(n_{\varepsilon i}) \\
+		\sin\varepsilon_i = \sin\varepsilon_{mi} - \cos\varepsilon_{mi}n_{\varepsilon i} + o(n_{\varepsilon i})
+	\end{cases}
+\end{equation}
+当 $n_{\varepsilon i}\rightarrow 0 , n_{\beta i} \rightarrow 0$ 时，可得 $o(n_{\beta i}) \approx 0, o(n_{\varepsilon i}) \approx 0, n_{\beta i}n_{\varepsilon i} \approx 0$，对这些无穷小量忽略不计，可将式(2-15)改写为
+\begin{equation}
+	\begin{cases}
+		-(\sin\beta_{mi} - \cos\beta_{mi}n_{\beta i})x_j +(\cos\beta_{mi} + \sin\beta_{mi}n_{\beta i})y_j \\
+		-(\sin\beta_{mi} - \cos\beta_{mi}n_{\beta i})(i-j)T v_x +(\cos\beta_{mi} + \sin\beta_{mi}n_{\beta i})(i-j)T v_y \\ \vspace{10pt}
+		=-(\sin\beta_{mi} - \cos\beta_{mi}n_{\beta i})B_{ix} +(\cos\beta_{mi} + \sin\beta_{mi}n_{\beta i})B_{iy} \\ 
+		-(\sin\varepsilon_{mi}\cos\beta_{mi} + n_{\beta i}\sin\varepsilon_{mi}\sin\beta_{mi} -n_{\varepsilon i}\cos\varepsilon_{mi}\cos\beta_{mi})x_j \\
+		-(\sin\varepsilon_{mi}\sin\beta_{mi} -n_{\beta i}\sin\varepsilon_{mi}\cos\beta_{mi} - n_{\varepsilon i}\cos\varepsilon_{mi}\sin\beta_{mi})y_j \\ 
+		+(\cos\varepsilon_{mi} + n_{\varepsilon i}\sin\varepsilon_{mi})z_j \\
+		-(\sin\varepsilon_{mi}\cos\beta_{mi} + n_{\beta i}\sin\varepsilon_{mi}\sin\beta_{mi} -n_{\varepsilon i}\cos\varepsilon_{mi}\cos\beta_{mi})(i-j)T v_x \\
+		-(\sin\varepsilon_{mi}\sin\beta_{mi} -n_{\beta i}\sin\varepsilon_{mi}\cos\beta_{mi} -n_{\varepsilon i} \cos\varepsilon_{mi}\sin\beta_{mi})(i-j)T v_y \\
+		+(\cos\varepsilon_{mi} + n_{\varepsilon i}\sin\varepsilon_{mi})(i-j)T v_z \\
+		=-(\sin\varepsilon_{mi}\cos\beta_{mi} +n_{\beta i} \sin\varepsilon_{mi}\sin\beta_{mi} -n_{\varepsilon i}\cos\varepsilon_{mi}\cos\beta_{mi})B_{ix} \\
+		-(\sin\varepsilon_{mi}\sin\beta_{mi} -n_{\beta i}\sin\varepsilon_{mi}\cos\beta_{mi} -n_{\varepsilon i} \cos\varepsilon_{mi}\sin\beta_{mi})B_{iy} \\
+		+(\cos\varepsilon_{mi} + n_{\varepsilon i}\sin\varepsilon_{mi})B_{iz} \\
+	\end{cases}
+\end{equation}
+其中 $i=0,1,\cdots,k,j \in \lbrace 0,1,\cdots, k \rbrace$。
+
+将上式的 $2(k+1)$ 个方程放在一起可以得到矩阵方程
+\begin{equation}
+	A\bm{X}_j = b
+\end{equation}
+其中 $\bm{X}_j$ 为目标在 $jT$ 时刻的状态矢量，记 $A = [A_1 \quad A_2]$，$A_1 = [A_{11}^T \quad A_{22}^T]^T$，$A_2 = [A_{21}^T \quad A_{22}^T]$，$b = [b_1^T \quad b_2^T]$，并记 $A$ 为系数矩阵，$b$ 为观测矩阵，具体表示如下：
+\begin{equation}
+	A_{11} =\left[ \begin{array}{ccc}
+		-\sin\beta_{m0} + \cos\beta_{m0}n_{\beta 0} & \cos\beta_{m0} + \sin\beta_{m0}n_{\beta 0} & 0\\
+		-\sin\beta_{m1} + \cos\beta_{m1}n_{\beta 1} & \cos\beta_{m1} + \sin\beta_{m1}n_{\beta 1} & 0\\
+		\vdots & \vdots & \vdots \\
+		-\sin\beta_{mk} + \cos\beta_{mk}n_{\beta k} & \cos\beta_{mk} + \sin\beta_{mk}n_{\beta k} & 0\\ 
+	\end{array} \right]
+\end{equation}
+\begin{equation}
+	A_{12} = \left[\begin{array}{ccc}
+		\vspace{5pt}
+		\begin{array}{c}
+			-\sin\varepsilon_{m0}\cos\beta_{m0} \\- n_{\beta 0}\sin\varepsilon_{m0}\sin\beta_{m0} \\+n_{\varepsilon 0}\cos\varepsilon_{m0}\cos\beta_{m0}
+		\end{array} & \begin{array}{c}
+			-\sin\varepsilon_{m0}\sin\beta_{m0} \\+n_{\beta 0}\sin\varepsilon_{m0}\cos\beta_{m0} \\+n_{\varepsilon 0} \cos\varepsilon_{m0}\sin\beta_{m0}
+		\end{array} & \begin{array}{c}
+			\cos\varepsilon_{m0} \\+ n_{\varepsilon 0}\sin\varepsilon_{m0}
+		\end{array} \\ 
+		\begin{array}{c}
+			-\sin\varepsilon_{m1}\cos\beta_{m1} \\- n_{\beta 1}\sin\varepsilon_{m1}\sin\beta_{m1} \\+n_{\varepsilon 1}\cos\varepsilon_{m1}\cos\beta_{m1}
+		\end{array} & \begin{array}{c}
+			-\sin\varepsilon_{m1}\sin\beta_{m1} \\+n_{\beta 1}\sin\varepsilon_{m1}\cos\beta_{m1} \\+n_{\varepsilon 1} \cos\varepsilon_{m1}\sin\beta_{m1}
+		\end{array} & \begin{array}{c}
+			\cos\varepsilon_{m1} \\+ n_{\varepsilon 1}\sin\varepsilon_{m1}
+		\end{array} \\ \vdots & \vdots & \vdots \\
+		\begin{array}{c}
+			-\sin\varepsilon_{mk}\cos\beta_{mk} \\- n_{\beta k}\sin\varepsilon_{mk}\sin\beta_{mk} \\+n_{\varepsilon k}\cos\varepsilon_{mk}\cos\beta_{mk}
+		\end{array} & \begin{array}{c}
+			-\sin\varepsilon_{mk}\sin\beta_{mk} \\+n_{\beta k}\sin\varepsilon_{mk}\cos\beta_{mk} \\+n_{\varepsilon k} \cos\varepsilon_{mk}\sin\beta_{mk}
+		\end{array} & \begin{array}{c}
+			\cos\varepsilon_{mk} \\+ n_{\varepsilon k}\sin\varepsilon_{mk}
+		\end{array} 
+	\end{array}\right]
+\end{equation}
+\begin{equation}
+	A_{21} = \left[ \begin{array}{ccc}
+		-(\sin\beta_{m0} - \cos\beta_{m0}n_{\beta 0})(0-j)T & (\cos\beta_{m0} + \sin\beta_{m0}n_{\beta 0})(0-j)T & 0 \\
+		-(\sin\beta_{m1} - \cos\beta_{m1}n_{\beta 1})(1-j)T & (\cos\beta_{m1} + \sin\beta_{m1}n_{\beta 1})(1-j)T & 0 \\
+		\vdots & \vdots & \vdots \\ 
+		-(\sin\beta_{mk} - \cos\beta_{mk}n_{\beta k})(k-j)T & (\cos\beta_{mk} + \sin\beta_{mk}n_{\beta k})(k-j)T & 0 \\
+	\end{array}\right]
+\end{equation}
+\begin{equation}
+	A_{22} = \left[\begin{array}{ccc}
+		\vspace{5pt} \begin{array}{c}
+			-(\sin\varepsilon_{m0}\cos\beta_{m0} \\+ n_{\beta 0}\sin\varepsilon_{m0}\sin\beta_{m0}- \\n_{\varepsilon 0}\cos\varepsilon_{m0}\cos\beta_{m0})(0-j)T
+		\end{array} & \begin{array}{c}
+			-(\sin\varepsilon_{m0}\sin\beta_{m0} \\-n_{\beta 0}\sin\varepsilon_{m0}\cos\beta_{m0}- \\n_{\varepsilon 0} \cos\varepsilon_{m0}\sin\beta_{m0})(0-j)T
+		\end{array} & \begin{array}{c}
+			(\cos\varepsilon_{m0}+ \\ n_{\varepsilon 0}\sin\varepsilon_{m0})(0-j)T
+		\end{array} \\
+		\begin{array}{c}
+			-(\sin\varepsilon_{m1}\cos\beta_{m1} \\+ n_{\beta 1}\sin\varepsilon_{m1}\sin\beta_{m1} -\\n_{\varepsilon 1}\cos\varepsilon_{m1}\cos\beta_{m1})(1-j)T
+		\end{array} & \begin{array}{c}
+			-(\sin\varepsilon_{m1}\sin\beta_{m1} \\-n_{\beta 1}\sin\varepsilon_{m1}\cos\beta_{m1} -\\n_{\varepsilon 1} \cos\varepsilon_{m1}\sin\beta_{m1})(1-j)T
+		\end{array} & \begin{array}{c}
+			(\cos\varepsilon_{m1} +\\ n_{\varepsilon 1}\sin\varepsilon_{m1})(1-j)T
+		\end{array} \\ 
+		\vdots & \vdots & \vdots \\
+		\begin{array}{c}
+			-(\sin\varepsilon_{mk}\cos\beta_{mk} \\+ n_{\beta k}\sin\varepsilon_{mk}\sin\beta_{mk}- \\n_{\varepsilon k}\cos\varepsilon_{mk}\cos\beta_{mk})(k-j)T
+		\end{array} & \begin{array}{c}
+			-(\sin\varepsilon_{mk}\sin\beta_{mk} \\-n_{\beta k}\sin\varepsilon_{mk}\cos\beta_{mk} -\\n_{\varepsilon k} \cos\varepsilon_{mk}\sin\beta_{mk})(k-j)T
+		\end{array} & \begin{array}{c}
+			(\cos\varepsilon_{mk} +\\ n_{\varepsilon k}\sin\varepsilon_{mk})(k-j)T
+		\end{array} 
+	\end{array}\right]
+\end{equation}
+\begin{equation}
+	b_1 =\left[ \begin{array}{c}
+		-(\sin\beta_{m0} - \cos\beta_{m0}n_{\beta 0})B_{0x} +(\cos\beta_{m0} + \sin\beta_{m0}n_{\beta 0})B_{0y} \\
+		-(\sin\beta_{m0} - \cos\beta_{m0}n_{\beta 0})B_{0x} +(\cos\beta_{m0} + \sin\beta_{m0}n_{\beta 0})B_{0y} \\
+		-(\sin\beta_{m0} - \cos\beta_{m0}n_{\beta 0})B_{0x} +(\cos\beta_{m0} + \sin\beta_{m0}n_{\beta 0})B_{0y} 	
+	\end{array} \right]
+\end{equation}
+\begin{equation}
+	b_2 = \left[\begin{array}{c}
+		\vspace{5pt} \begin{array}{c}
+			-(\sin\varepsilon_{m0}\cos\beta_{m0} +n_{\beta 0} \sin\varepsilon_{m0}\sin\beta_{m0} -n_{\varepsilon 0}\cos\varepsilon_{m0}\cos\beta_{m0})B_{0x} \\
+			-(\sin\varepsilon_{m0}\sin\beta_{m0} -n_{\beta 0}\sin\varepsilon_{m0}\cos\beta_{m0} -n_{\varepsilon 0} \cos\varepsilon_{m0}\sin\beta_{m0})B_{0y} \\
+			+(\cos\varepsilon_{m0} + n_{\varepsilon 0}\sin\varepsilon_{m0})B_{0z}
+		\end{array} \\
+		\begin{array}{c}
+			-(\sin\varepsilon_{1}\cos\beta_{m1} +n_{\beta 1} \sin\varepsilon_{m1}\sin\beta_{m1} -n_{\varepsilon 1}\cos\varepsilon_{m1}\cos\beta_{m1})B_{1x} \\
+			-(\sin\varepsilon_{m1}\sin\beta_{m1} -n_{\beta 1}\sin\varepsilon_{m1}\cos\beta_{m1} -n_{\varepsilon 1} \cos\varepsilon_{m1}\sin\beta_{m1})B_{1y} \\
+			+(\cos\varepsilon_{m1} + n_{\varepsilon 1}\sin\varepsilon_{m1})B_{1z}
+		\end{array} \\
+		\vdots \\
+		\begin{array}{c}
+			-(\sin\varepsilon_{mk}\cos\beta_{mk} +n_{\beta k} \sin\varepsilon_{mk}\sin\beta_{mk} -n_{\varepsilon k}\cos\varepsilon_{mk}\cos\beta_{mk})B_{kx} \\
+			-(\sin\varepsilon_{mk}\sin\beta_{mk} -n_{\beta k}\sin\varepsilon_{mk}\cos\beta_{mk} -n_{\varepsilon k} \cos\varepsilon_{mk}\sin\beta_{mk})B_{ky} \\
+			+(\cos\varepsilon_{mk} + n_{\varepsilon k}\sin\varepsilon_{mk})B_{kz}
+		\end{array}
+	\end{array}\right]
+\end{equation}
+考虑将矩阵 $A,b$ 分解为测量值和误差项的和，即 $A = A^* + \Delta_A,b = b^* + \Delta_b$，则有如下表示：
+\begin{equation}
+	A_{1}^* = \left[\begin{array}{ccc}
+		-\sin\beta_{m0} & \cos\beta_{m0} & 0 \\
+		-\sin\beta_{m1} & \cos\beta_{m1} & 0 \\
+		\vdots & \vdots & \vdots \\
+		-\sin\beta_{mk} & \cos\beta_{mk} & 0 \\ \hline 
+		-\sin\varepsilon_{m0}\cos\beta_{m0} & -\sin\varepsilon_{m0}\sin\beta_{m0} & \cos\varepsilon_{m0} \\
+		-\sin\varepsilon_{m1}\cos\beta_{m1} & -\sin\varepsilon_{m1}\sin\beta_{m1} & \cos\varepsilon_{m1} \\
+		\vdots & \vdots & \vdots \\
+		-\sin\varepsilon_{mk}\cos\beta_{mk} & -\sin\varepsilon_{mk}\sin\beta_{mk} & \cos\varepsilon_{mk} 
+	\end{array}\right]
+\end{equation}
+\begin{equation}
+	A_{2}^* = \left[\begin{array}{ccc}
+		-\sin\beta_{m0}(0-j)T & \cos\beta_{m0}(0-j)T & 0 \\
+		-\sin\beta_{m1}(1-j)T & \cos\beta_{m1}(1-j)T & 0 \\
+		\vdots & \vdots & \vdots \\
+		-\sin\beta_{mk}(k-j)T & \cos\beta_{mk}(k-j)T & 0 \\ \hline
+		-\sin\varepsilon_{m0}\cos\beta_{m0}(0-j)T & -\sin\varepsilon_{m0}\sin\beta_{m0}(0-j)T & \cos\varepsilon_{m0}(0-j)T \\
+		-\sin\varepsilon_{m1}\cos\beta_{m1}(1-j)T & -\sin\varepsilon_{m1}\sin\beta_{m1}(1-j)T & \cos\varepsilon_{m1}(1-j)T \\
+		\vdots & \vdots & \vdots \\
+		-\sin\varepsilon_{mk}\cos\beta_{mk}(k-j)T & -\sin\varepsilon_{mk}\sin\beta_{mk}(k-j)T & \cos\varepsilon_{mk}(k-j)T
+	\end{array}\right]
+\end{equation}
+\begin{equation}
+	b^* = \left[\begin{array}{c}
+		-\sin\beta_{m0}B_{0x} + \cos\beta_{m0}B_{0y} \\
+		-\sin\beta_{m1}B_{1x} + \cos\beta_{m1}B_{1y} \\
+		\vdots \\
+		-\sin\beta_{mk}B_{kx} + \cos\beta_{mk}B_{ky} \\ \hline
+		-\sin\varepsilon_{m0}\cos\beta_{m0}B_{0x}-\sin\varepsilon_{m0}\sin\beta_{m0}B_{0y} + \cos\varepsilon_{m0}B_{0z} \\
+		-\sin\varepsilon_{m1}\cos\beta_{m1}B_{1x}-\sin\varepsilon_{m1}\sin\beta_{m1}B_{1y} + \cos\varepsilon_{m1}B_{1z} \\
+		\vdots \\
+		-\sin\varepsilon_{mk}\cos\beta_{mk}B_{kx}-\sin\varepsilon_{mk}\sin\beta_{mk}B_{ky} + \cos\varepsilon_{mk}B_{kz} 
+	\end{array}
+	\right]
+\end{equation}
+从而式(2-19)可以表示为
+\begin{equation}
+	(A^* + \Delta_A)\bm{X}_j = b^* + \Delta_b
+\end{equation}
+经过以上步骤将角度信息量这种非线性问题式(2-13)化为线性问题，即式(2-19)，再通过将测量值和误差项分解得到式(2-29)，下面将介绍不同的算法求解目标的状态。
