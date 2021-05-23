@@ -43,6 +43,7 @@
 	H \bm{X} = \bm{0}
 \end{equation}
 
+\setcounter{section}{1}
 \section*{B}
 考虑如下线性系统
 \begin{equation}
@@ -51,7 +52,7 @@
 		\bm{z} =& H \bm{x}
 	\end{split}	
 \end{equation}
-其中 $A,H$ 是给出的连续可微矩阵，$\bm{w}$ 是已知向量，$\bm{x}$ 是 $n$ 维向量，$\bm{z}$ 是测量向量，并且该系统中不存在噪声干扰，视为理想情况。
+其中 $A,H$ 是给出的连续可微矩阵，$\bm{w}$ 是已知向量，$\bm{x}$ 是 $n$ 维向量，$\bm{z}$ 是测量向量，并且该系统中不存在噪声干扰，视为理想情况．
 令 $C_0 = H, \bm{z}_0 = \bm{z}$，第一次微分可得
 \begin{equation}
 	\dot{\bm{z}}_0 = \dot{C}_0\bm{x} + C_0\dot{\bm{x}}
@@ -83,8 +84,138 @@
 \begin{equation}
 	C^T\bm{Z} = C^TC \bm{x}
 \end{equation}
-则当且仅当 $C^TC$ 是非奇异的，即 $\det[C^TC] \not \equiv 0$ 时，$\bm{x}$ 可以被唯一确定。若 $C^TC$ 是奇异的，则
+则当且仅当 $C^TC$ 是非奇异的，即 $\det[C^TC] \not \equiv 0$ 时，$\bm{x}$ 可以被唯一确定．若 $C^TC$ 是奇异的，则
 \begin{equation}
 	\bm{x} = (C^TC)^*C^T Z + [I- (C^TC)^* (C^TC)]\bm{y}
 \end{equation}
-其中 $(C^TC)^*$ 是 $C^TC$ 的广义逆，$\bm{y}$ 是任意 $n$ 维向量，故此时 $\bm{x}$ 是不唯一的。
+其中 $(C^TC)^*$ 是 $C^TC$ 的广义逆，$\bm{y}$ 是任意 $n$ 维向量，故此时 $\bm{x}$ 是不唯一的．
+
+\setcounter{section}{2}
+\section*{C}
+\begin{equation}
+	D = \left[\begin{array}{c|c|c|c}
+		I & O & \bm{0} & \bm{0} \\ \hline
+		O & I & \bm{0} & \bm{0} \\ \hline
+		O & O & \bm{h}_2 & 2\bm{h}_1 \\ \hline
+		O & O & \bm{h}_3 & 3\bm{h}_2 \\ \hline
+		O & O & \bm{h}_4 & 4\bm{h}_3 \\ \hline
+		O & O & \bm{h}_5 & 5\bm{h}_4
+	\end{array}\right] \quad B = \left[\begin{array}{c|c|c|c}
+		I & \bm{h}_0 & O & \bm{0} \\ \hline
+		O & \bm{h}_1 & I & \bm{h}_0 \\ \hline
+		\bm{0}^T & 1 & \bm{0}^T & 0 \\ \hline
+		\bm{0}^T & 0 & \bm{0}^T & 1
+\end{array} \right]
+\end{equation}
+其中，$O$ 为 $2\times 2$ 的零矩阵，$\det[B]=1$，则有
+\begin{equation}
+	\begin{split}
+			\det[C^T C] =& \det[(DB)^T (DB)]=\det[D^T D] \\
+			=&\det \left[\begin{array}{cc}
+			\sum_{i=1}^{4} \bm{h}_{i+1}^T \bm{h}_{i+1} & \sum_{i=1}^{4} \bm{h}_{i+1}^T \bm{h}_i \\
+			\sum_{i=1}^{4}(i+1)\bm{h}_i^T\bm{h}_{i+1} & \sum_{i=1}^{4}(i+1)^2 \bm{h}_i^T \bm{h}_i
+		\end{array}\right]
+	\end{split}
+\end{equation}
+计算得到
+\begin{equation}
+	\begin{split}
+		\det[C^T C] =&\left[\sum_{i=1}^{4}\bm{h}_{i+1}^T\bm{h}_{i+1} \right] \left[\sum_{i=1}^{4}(i+1)^2 \bm{h}_{i}^T\bm{h}_i \right] - \left[ \sum_{i=1}^{4} (i+1) \bm{h}_i^T \bm{h}_{i+1} \right]^2 \\
+		=& \sum_{i=1}^{4} \sum_{j=1}^{4} [(i+1)^2 (\bm{h}_{i}^T \bm{h}_i)(\bm{h}_{j+1}^T \bm{h}_{j+1}) - (i+1)(j+1)(\bm{h}_i^T \bm{h}_{i+1}) (\bm{h}_j^T \bm{h}_{j+1})] \\
+		=&\frac{1}{2}\sum_{i=1}^{4} \sum_{j=1}^{4}\lbrace [(i+1)f_i f_{j+1} - (j+1)f_j f_{i+1}]^2 + 2[(i+1)f_i g_{j+1} - (j+1) g_j f_{i+1}]^2 \\
+		&+ [(i+1)g_i g_{j+1} - (j+1) g_j g_{i+1}]^2 \rbrace
+	\end{split}
+\end{equation}
+根据上式 $\det [C^T C] = 0$当且仅当
+\begin{equation}
+	\begin{split}
+		(i+1)f_i f_{j+1} - (j+1) f_{i+1} f_{j} =& 0 \\
+		(i+1) f_i g_{j+1} - (j+1) f_{i+1} g_j =& 0  \\
+		(i+1) g_i g_{j+1} - (j+1) g_{i+1} g_j =& 0
+	\end{split}
+\end{equation}
+对所有的 $i,j =1,2,3,4$ 成立．通过利用式(2-9)及求解微分方程得到上式的等价方程
+\begin{equation}
+	\begin{split}
+		2f_1 f_3 - 3f_2 f_2 =& 0 \\
+		f_1 g_2 - f_2 g_1 =& 0 \\
+		2g_1 g_3 - 3 g_2 g_2 =& 0
+ 	\end{split}
+\end{equation}
+观察上式可知 $\bm{h}_0 = [f_0 \quad g_0]^T = c\text{(常数)}$，是该方程的一个平凡解，且得到 $\bm{h}_i = [f_i \quad g_i]^T=\bm{0},i \neq 0$，考虑方程的非平凡解，令 $\bm{h}_1 \not \equiv 0$，由式(4-19)的第二个等式得到
+\begin{equation}
+	\bm{h}_2 = \lambda \bm{h}_2
+\end{equation}  
+其中，$\lambda$ 是需要被确定的标量函数，根据式(2-9)
+\begin{equation}
+	\frac{d\bm{h}_1}{dt} - \lambda \bm{h}_1 =\bm{0}
+\end{equation}
+上式对 $t$ 在区间 $[t_0,t]$ 上求积分得
+\begin{equation}
+	\bm{h}_1(t) = \exp \left[ \int_{t_0}^{t_1} \lambda (\mu) d \mu \right] \bm{h}_1 (t_0)
+\end{equation}
+由式(4-19)第一个和第三个等式得到
+\begin{equation}
+	2\bm{h}_1^T \bm{h}_3 - 3 \bm{h}_2^T \bm{h}_2 = 0
+\end{equation}
+对式(4-20)求微分得
+\begin{equation}
+	\bm{h}_3 = \dot{\lambda} \bm{h}_1 + \lambda \bm{h}_2
+\end{equation}
+把 $\bm{h}_2,\bm{h}_3$ 代入式(4-23)得
+\begin{equation}
+	(2\dot{\lambda} - \lambda^2) \bm{h}_1^T \bm{h}_1 = 0
+\end{equation}
+由于 $\bm{h}_1 \not \equiv 0$，因此有 $\bm{h}_1^T \bm{h}_1 \not \equiv 0$，从而得到
+\begin{equation}
+	2\dot{\lambda} - \lambda^2 =0
+\end{equation}
+求解上式
+\begin{equation}
+	\lambda (t) = \frac{\lambda (t_0)}{1-[\lambda (t_0)/2](t-t_0)}
+\end{equation}
+再根据式(4-22)解得
+\begin{equation}
+	\bm{h}_1 = \frac{d \bm{h}_0 (t)}{d t} = \frac{\bm{h}_1 (t_0)}{\left\{1-[\lambda (t_0)/2](t-t_0)\right\} ^2}
+\end{equation}
+上式对时间在区间 $[t_0,t]$ 求积分得到
+\begin{equation}
+	\bm{h}_0(t) = \bm{h}_0 (t_0) +\frac{\bm{h}_1(t-t_0)}{1-[\lambda (t_0)/2](t-t_0)}
+\end{equation}
+上述结果在数学上满足 $\det[C^T C] =0$ 的充要条件，由于 $\bm{h}_0 = [r_x/r_z \quad r_y/r_z]^T$，可得
+\begin{equation}
+	\left[\begin{array}{c}
+		\bm{h}_0 (t) - \bm{h}_0 (t_0) \\ \hline
+		0
+	\end{array}\right] = \frac{\bm{r}(t)}{r_z (t)} - \frac{\bm{r}(t_0)}{r_z (t_0)}
+\end{equation}
+由于 $t_0$ 时刻船没有操纵，即 $\bm{a}_0(t_0) = \bm{0}$，对上式求微分
+得到
+\begin{equation}
+	\begin{split}
+		\left[\begin{array}{c}
+			\bm{h}_1 (t_0) \\ \hline
+			0
+		\end{array}\right] =& \frac{r_z(t_0)\bm{v}(t_0) - v_z(t_0)\bm{r}(t_0)}{r_z^2 (t_0)} \\
+		\left[ \begin{array}{c}
+			\bm{h}_2(t_0) \\ \hline
+			0
+		\end{array}\right] =& -2\frac{v_z(t_0)}{r_z(t_0)}\left( \frac{r_z(t_0) \bm{v}(t_0) - v_z(t_0)\bm{r}(t_0)}{r_z^2(t_0)}\right)
+	\end{split} 
+\end{equation}
+由式(4-20)和上式可得
+\begin{equation}
+	\lambda (t_0) = -2 \frac{v_z(t_0)}{r_z (t_0)}
+\end{equation}
+根据式(4-29)，式(4-30)，式(4-31)和式(4-32)可得到
+\begin{equation}
+	\frac{\bm{r}(t)}{\bm{r}_z (t)} = \frac{\bm{r}(t_0) +(t-t_0)\bm{v}(t_0)}{r_z(t_0) + (t-t_0) v_z (t_0)}
+\end{equation}
+最后由式(2-3)可将上式写为
+\begin{equation}
+	\int_{t_0}^{t} (t-\tau) \bm{a}_0 (\tau)d \tau = \alpha(t) [\bm{r}(t_0) + (t-t_0) \bm{v}(t_0)]
+\end{equation}
+其中 $\alpha(t)$ 是任意标量函数．由此可知 $\det[C^T C] \not \equiv 0$ 等价于
+\begin{equation}
+	\int_{t_0}^{t} (t-\tau) \bm{a}_0 (\tau)d \tau \not \equiv \alpha(t) [\bm{r}(t_0) + (t-t_0) \bm{v}(t_0)]
+\end{equation}

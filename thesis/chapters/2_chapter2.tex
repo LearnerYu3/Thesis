@@ -49,9 +49,9 @@
   \caption{纯角度单站跟踪定位模型示意图}
 \end{figure}
 
-其中，$G$ 表示运动的目标，$B$ 表示运动的观测站，$\bm{v_G}$ 和 $\bm{v_B}$ 分别表示目标和观测站运动的速度矢量，$\varepsilon$ 表示目标 $G$ 和观测站 $B$ 连线与 $XOY$ 平面形成的夹角，并称之为仰角，$\beta$ 表示目标 $G$ 在 $XOY$ 平面的投影点和观测站 $B$ 连线与 $X$ 轴正向形成的夹角，并称之为方位角。
+其中，$G$ 表示运动的目标，$B$ 表示运动的观测站，$\bm{v_G}$ 和 $\bm{v_B}$ 分别表示目标和观测站运动的速度矢量，$\varepsilon$ 表示目标 $G$ 和观测站 $B$ 连线与 $XOY$ 平面形成的夹角，并称之为仰角，$\beta$ 表示目标 $G$ 在 $XOY$ 平面的投影点和观测站 $B$ 连线与 $X$ 轴正向形成的夹角，并称之为方位角．
 
-在纯角度信息的单站跟踪定位模型中，观测站的运动信息是已知的，观测站每经过时间 $T$ 对运动的目标进行一次测量，得到目标的仰角和方位角测量值，然后根据这些已知信息对目标进行定位跟踪。然而，在多数情况下，单站无源定位在仅有角度信息时只能描述目标所在的方向，无法确定目标的距离，从而也就无法确定目标的实际位置。因此需要对运动目标的可观测性进行分析。
+在纯角度信息的单站跟踪定位模型中，观测站的运动信息是已知的，观测站每经过时间 $T$ 对运动的目标进行一次测量，得到目标的仰角和方位角测量值，然后根据这些已知信息对目标进行定位跟踪．然而，在多数情况下，单站无源定位在仅有角度信息时只能描述目标所在的方向，无法确定目标的距离，从而也就无法确定目标的实际位置．因此需要对运动目标的可观测性进行分析．
 \section{可观测性分析}
 假设目标做匀速直线运动，根据文献\cite{4104040}，假设目标 $G$ 的位置坐标为 $(r_{Gx},r_{Gy},r_{Gz})$，以速度 $(v_{Gx},v_{Gy},v_{Gz})$ 匀速运动，故目标在坐标系下的状态矢量可表示为 
 \begin{equation*}
@@ -67,7 +67,7 @@
 \end{equation}
 从而得到
 \begin{equation}
-	\dot{\bm{X}} = A\bm{X} - \bm{u} \label{eq:1}
+	\dot{\bm{X}} = A\bm{X} - \bm{u} 
 \end{equation}
 其中
 \begin{equation*}
@@ -81,14 +81,14 @@
 		\end{array} \right ], \quad
 	\bm{u} = [\bm{0}, \bm{a}^T ]^T = [0, 0, 0, a_x, a_y, a_z]^T 
 \end{equation*}
-$\bm{a} = [a_x,a_y,a_z]^T$ 表示观测站的加速度，对式\ref{eq:1}求积分可得
+$\bm{a} = [a_x,a_y,a_z]^T$ 表示观测站的加速度，对式(2-2)求积分可得
 \begin{equation}
 	\begin{split}
 		\bm{r}(t) =& \bm{r}(t_0) + (t-t_0)\bm{v}(t_0) - \int_{t_0}^{t}(t-\tau)\bm{a}(\tau)d\tau \\
 		\bm{v}(t) =& \bm{v}(t_0) - \int_{t_0}^{t}\bm{a}(\tau)d\tau
 	\end{split}	
 \end{equation}
-其中 $t_0$ 表示任意确定的初始时刻。
+其中 $t_0$ 表示任意确定的初始时刻．
 
 对于方位角和仰角，根据几何知识可以得到
 \begin{equation}
@@ -99,7 +99,7 @@ $\bm{a} = [a_x,a_y,a_z]^T$ 表示观测站的加速度，对式\ref{eq:1}求积�
 \end{equation}
 对上式做等价变形可得到（参见附录中A部分）
 \begin{equation}
-	H\bm{X}=\bm{0} \label{eq:2}
+	H\bm{X}=\bm{0} 
 \end{equation}
 其中
 \begin{equation*}
@@ -108,7 +108,7 @@ $\bm{a} = [a_x,a_y,a_z]^T$ 表示观测站的加速度，对式\ref{eq:1}求积�
 		0 & 1 & -\sin\beta\cot\varepsilon & 0 & 0 & 0
 	\end{array}\right]
 \end{equation*}
-假定 $\varepsilon \not \equiv 0$，在不考虑噪声的情况下，可以精确确定 $\bm{H}$，根据附录中B部分结论可对式(\ref{eq:1})和式(\ref{eq:2})的线性系统进行处理，从而得到可观测性的充分必要条件，即目标可被唯一确定的充分必要条件。
+假定 $\varepsilon \not \equiv 0$，在不考虑噪声的情况下，可以精确确定 $\bm{H}$，根据附录中B部分结论可对式(2-2)和式(2-5)的线性系统进行处理，从而得到可观测性的充分必要条件，即目标可被唯一确定的充分必要条件．
 \begin{equation}
 	\det[C^TC] \not \equiv 0
 \end{equation}
@@ -163,24 +163,24 @@ $\bm{a} = [a_x,a_y,a_z]^T$ 表示观测站的加速度，对式\ref{eq:1}求积�
 	\begin{split}
 		\det[C^TC] =& \frac{1}{2}\sum_{i=1}^{4}\sum_{j=1}^{4}\lbrace [(i+1)f_i f_{j+1} - (j+1)f_j f_{i+1}]^2 + 2[(i+1)f_i g_{j+1} - (j+1) g_j f_{i+1}]^2 \\
 		&+ [(i+1)g_i g_{j+1} - (j+1)g_j g_{i+1}]^2 \rbrace
-	\end{split}	\label{eq:3}
+	\end{split}	
 \end{equation}
-由式(\ref{eq:3})可看出，当且仅当两次求和中至少有一项不完全相同时，才满足 $\det[C^TC] \not \equiv 0$，根据附录中C部分可以得到满足该条件的充分必要条件为
+由式(2-11)可看出，当且仅当两次求和中至少有一项不完全相同时，才满足 $\det[C^TC] \not \equiv 0$，根据附录中C部分可以得到满足该条件的充分必要条件为
 \begin{equation}
 	\int_{t_0}^{t}(t-\tau)\bm{a}(\tau)d\tau \not \equiv \alpha(t)[\bm{r}(t_0)+(t-t_0)\bm{v}(t_0)]
 \end{equation}
 对任意的标量函数 $\alpha$ 成立
 
-通过以上描述，得到了目标做匀速直线运动时的可观测性条件。本文的以下内容是在可观测的条件下对纯角度的单站无源定位模型进行分析求解。
+通过以上描述，得到了目标做匀速直线运动时的可观测性条件．本文的以下内容是在可观测的条件下对纯角度的单站无源定位模型进行分析求解．
 \section{跟踪定位模型}
 假设目标做匀速直线运动，在 $k$ 个时间周期，每个时间周期时间为 $T$，观测站从初始时刻（记初始时刻 $t_0=0$）开始测量目标的方位信息，之后每经过时间周期 $T$ 对目标的方位信息进行一次测量，得到目标相对于观测站的仰角和方位角分别为 $\varepsilon_i$ 和 $\beta_i$，其中 $k = 0,1,2,\cdots,k$ 
 
-根据图(2-1)及几何关系可得：
+根据图(2-1)及几何关系可得到观测方程如下：
 \begin{equation}
 	\begin{cases}
 		\beta_i = \arctan \frac{y_i-B_{iy}}{x_i-B_{ix}} &i=0,1,2,\cdots,k \\
 		\varepsilon_i = \arctan \frac{z_i-B_{iz}}{\sqrt{(x_i-B_{ix})^2 + (y_i - B_{iy})^2}} \quad &i=0,1,2,\cdots,k
-	\end{cases}\label{eq:arctan}
+	\end{cases}
 \end{equation}
 其中，$(B_{ix},B_{iy},B_{iz})$ 表示观测站 $B$ 在时刻 $iT$ 时的坐标，$\bm{X}_i = (x_i,y_i,z_i,v_x,v_y,v_z)^T$ 表示目标在时刻 $iT$ 时的状态矢量，从而可以由目标在 $iT$ 时刻的状态得到目标在 $jT$ 时刻的状态：
 \begin{equation}
@@ -190,7 +190,7 @@ $\bm{a} = [a_x,a_y,a_z]^T$ 表示观测站的加速度，对式\ref{eq:1}求积�
 		z_j = z_i + v_z(j-i)T
 	\end{cases}
 \end{equation}
-其中 $i,j \in \lbrace 0,1,2,\cdots,k \rbrace$。根据三角函数公式并结合式(2-14)可以对式(\ref{eq:arctan})进行如下变形：
+其中 $i,j \in \lbrace 0,1,2,\cdots,k \rbrace$．根据三角函数公式并结合式(2-14)可以对式(2-13)进行如下变形：
 \begin{equation}
 	\begin{cases}
 		\cos\beta_i(y_j + v_y(i-j)T-B_{iy}) = \sin\beta_i(x_j+v_x(i-j)T-B_{ix}) \\
@@ -198,7 +198,7 @@ $\bm{a} = [a_x,a_y,a_z]^T$ 表示观测站的加速度，对式\ref{eq:1}求积�
 		 = \cos\varepsilon_i (z_j + v_z(i-j)T - B_{iz})
 	\end{cases}
 \end{equation}
-其中 $i=0,1,2,\cdots,k,j \in \lbrace 0,1,2,\cdots,k \rbrace$。
+其中 $i=0,1,2,\cdots,k,j \in \lbrace 0,1,2,\cdots,k \rbrace$．
 由于在实际情况中测量角度得到的观测值可能存在噪声，并不是真实值，即
 \begin{equation}
 	\begin{cases}
@@ -206,7 +206,7 @@ $\bm{a} = [a_x,a_y,a_z]^T$ 表示观测站的加速度，对式\ref{eq:1}求积�
 		\varepsilon_{mi} = \varepsilon_i + n_{\varepsilon i}
 	\end{cases}
 \end{equation}
-其中，$\beta_{mi},\varepsilon_{mi}$ 表示观测值，$\beta_i,\varepsilon_i$ 表示真实值，$n_{\beta i},n_{\varepsilon i}$ 表示误差值，并假设 $n_{\beta i} \sim N(0,\sigma^2),n_{\varepsilon i} \sim N(0,\sigma^2)$，且$n_{\beta i},n_{\varepsilon i}$相互独立。
+其中，$\beta_{mi},\varepsilon_{mi}$ 表示观测值，$\beta_i,\varepsilon_i$ 表示真实值，$n_{\beta i},n_{\varepsilon i}$ 表示误差值，并假设 $n_{\beta i} \sim N(0,\sigma^2),n_{\varepsilon i} \sim N(0,\sigma^2)$，且$n_{\beta i},n_{\varepsilon i}$相互独立．
 由 Taylor 展开，令$n_{\varepsilon i} \rightarrow 0,n_{\beta i} \rightarrow 0$，可以得到
 \begin{equation}
 	\begin{cases}
@@ -233,7 +233,7 @@ $\bm{a} = [a_x,a_y,a_z]^T$ 表示观测站的加速度，对式\ref{eq:1}求积�
 		+(\cos\varepsilon_{mi} + n_{\varepsilon i}\sin\varepsilon_{mi})B_{iz} \\
 	\end{cases}
 \end{equation}
-其中 $i=0,1,\cdots,k,j \in \lbrace 0,1,\cdots, k \rbrace$。
+其中 $i=0,1,\cdots,k,j \in \lbrace 0,1,\cdots, k \rbrace$．
 
 将上式的 $2(k+1)$ 个方程放在一起可以得到矩阵方程
 \begin{equation}
@@ -377,4 +377,4 @@ $\bm{a} = [a_x,a_y,a_z]^T$ 表示观测站的加速度，对式\ref{eq:1}求积�
 \begin{equation}
 	(A^* + \Delta_A)\bm{X}_j = b^* + \Delta_b
 \end{equation}
-经过以上步骤将角度信息量这种非线性问题式(2-13)化为线性问题，即式(2-19)，再通过将测量值和误差项分解得到式(2-29)，下面将介绍不同的算法求解目标的状态。
+经过以上步骤将角度信息量这种非线性问题式(2-13)化为线性问题，即式(2-19)，再通过将测量值和误差项分解得到式(2-29)，下面将介绍不同的算法求解目标的状态．
